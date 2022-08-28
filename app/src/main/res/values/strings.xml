@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">1-Entrega-Mobile</string>
+
+    <string-array name="taskPriority">
+        <item>Low</item>
+        <item>Medium</item>
+        <item>High</item>
+        <item>Urgent</item>
+    </string-array>
+
+    <string name="checked">checked</string>
+    <string name="unchecked">unchecked</string>
+    <string name="about_app">about app</string>
+    <string name="exit_app">exit</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+</resources>
