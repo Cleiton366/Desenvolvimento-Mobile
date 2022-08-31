@@ -1,31 +1,45 @@
-
 package com.example.a1_entrega_mobile
 
 import android.content.Intent
+import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ArrayAdapter
-import android.widget.ListView
+import android.widget.Button
+import android.widget.Spinner
 import android.widget.Toast
 import kotlin.system.exitProcess
 
-class MainActivity : AppCompatActivity() {
+class SubmitTask : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        allTasksListView()
+        setContentView(R.layout.activity_submit_task)
+
+        //setting spinner values
+        val spinner: Spinner = findViewById(R.id.prioritySpinner)
+        ArrayAdapter.createFromResource(this, R.array.taskPriority,
+            android.R.layout.simple_spinner_item
+        ).also { adapter -> adapter.setDropDownViewResource(
+            android.R.layout.simple_spinner_dropdown_item)
+            spinner.adapter = adapter }
+
+        //submit task btn
+        val submitTaskBtn : Button = findViewById(R.id.submitTaskBtn)
+        submitTaskBtn.setOnClickListener {
+            playSubmitTaskAudio()
+            Toast.makeText(this, "Task Saved", Toast.LENGTH_SHORT).show()
+        }
+
+        val cancelBtn : Button = findViewById(R.id.cancelBtn)
+        cancelBtn.setOnClickListener {
+
+        }
     }
 
-    private fun allTasksListView () {
-        val listView : ListView = findViewById(R.id.allTasksListView)
-        val tasksArr = arrayListOf("Learn Kotlin","Do the laundry","Study for the test on friday",
-            "Do the grocery","Walk with the dog","Do the dishes")
-        val arrayAdapter : ArrayAdapter<String> = ArrayAdapter(this, android.R.layout.simple_list_item_1, tasksArr)
-        listView.adapter = arrayAdapter
-    }
-
+    // render menu
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu to use in the action bar
         val inflater = menuInflater
@@ -33,6 +47,7 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    //change activity on the menu
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.about -> {
@@ -40,11 +55,11 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.create_new_task -> {
-                val intent = Intent(this,  SubmitTask::class.java)
-                startActivity(intent)
                 true
             }
             R.id.view_tasks -> {
+                val intent = Intent(this,  MainActivity::class.java)
+                startActivity(intent)
                 true
             }
             R.id.user_profile -> {
@@ -54,5 +69,11 @@ class MainActivity : AppCompatActivity() {
             }
             else -> exitProcess(-1)
         }
+    }
+
+    //play audios given an url
+    private fun playSubmitTaskAudio() {
+        val mediaPlayer = MediaPlayer.create(this, R.raw.submittasksound)
+        mediaPlayer.start()
     }
 }

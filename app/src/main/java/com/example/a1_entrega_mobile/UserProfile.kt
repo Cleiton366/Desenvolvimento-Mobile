@@ -18,7 +18,7 @@ class UserProfile : AppCompatActivity() {
         // Inflate the menu to use in the action bar
         val inflater = menuInflater
         inflater.inflate(R.menu.app_menu, menu)
-        return true;
+        return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -28,12 +28,12 @@ class UserProfile : AppCompatActivity() {
                 true
             }
             R.id.create_new_task -> {
-                var intent = Intent(this,  MainActivity::class.java)
+                val intent = Intent(this,  SubmitTask::class.java)
                 startActivity(intent)
                 true
             }
             R.id.view_tasks -> {
-                var intent = Intent(this,  AllTasksActivity::class.java)
+                val intent = Intent(this,  MainActivity::class.java)
                 startActivity(intent)
                 true
             }

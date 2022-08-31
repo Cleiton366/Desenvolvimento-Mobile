@@ -10,6 +10,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.1EntregaMobile">
         <activity
+            android:name=".SubmitTask"
+            android:exported="true" />
+        <activity
             android:name=".UserProfile"
             android:exported="true" />
         <activity
