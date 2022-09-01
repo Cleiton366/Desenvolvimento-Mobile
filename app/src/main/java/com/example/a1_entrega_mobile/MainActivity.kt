@@ -9,19 +9,38 @@ import android.view.MenuItem
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.Toast
+import kotlin.collections.ArrayList
 import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
+
+    var tasks: MutableList<Task>  = ArrayList()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        //setting arrays of tasks
+        val task = intent.extras?.get("task") as? Task
+        task ?.let{ tasks.add(task) }
+
         allTasksListView()
+
+        val listView : ListView = findViewById(R.id.allTasksListView)
+        listView.setOnItemClickListener { parent, _, position, _ ->
+            val task = tasks[position]
+
+            Toast.makeText(this, task.toString(), Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, SubmitTask::class.java)
+            intent.putExtra("task", task)
+            startActivity(intent)
+        }
+
     }
 
     private fun allTasksListView () {
         val listView : ListView = findViewById(R.id.allTasksListView)
-        val tasksArr = arrayListOf("Learn Kotlin","Do the laundry","Study for the test on friday",
-            "Do the grocery","Walk with the dog","Do the dishes")
+        val tasksArr = tasks.map { it.taskName }
         val arrayAdapter : ArrayAdapter<String> = ArrayAdapter(this, android.R.layout.simple_list_item_1, tasksArr)
         listView.adapter = arrayAdapter
     }

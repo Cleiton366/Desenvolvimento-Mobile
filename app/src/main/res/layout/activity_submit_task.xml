@@ -38,7 +38,7 @@
             app:layout_constraintTop_toBottomOf="@+id/prioritySpinner" />
 
         <ToggleButton
-            android:id="@+id/toggleButton2"
+            android:id="@+id/toggleBtnNotification"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="50dp"
@@ -62,11 +62,11 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.507"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/radio_group"
+            app:layout_constraintTop_toBottomOf="@+id/radio_group_estimative"
             tools:ignore="SpeakableTextPresentCheck" />
 
         <RadioGroup
-            android:id="@+id/radio_group"
+            android:id="@+id/radio_group_estimative"
             android:layout_width="345dp"
             android:layout_height="306dp"
             android:layout_marginTop="20dp"

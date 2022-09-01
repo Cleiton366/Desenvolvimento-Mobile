@@ -1,22 +1,30 @@
 package com.example.a1_entrega_mobile
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.Spinner
-import android.widget.Toast
+import android.widget.*
+import java.util.*
 import kotlin.system.exitProcess
 
 class SubmitTask : AppCompatActivity() {
 
+    private var radioValue : Int = 0
+    private var isEditing : Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_submit_task)
+
+        //getting task value if user wants to edit
+        val task = intent.extras?.get("task") as? Task
+        task ?.let{
+            fillForm(task)
+        }
 
         //setting spinner values
         val spinner: Spinner = findViewById(R.id.prioritySpinner)
@@ -30,13 +38,23 @@ class SubmitTask : AppCompatActivity() {
         val submitTaskBtn : Button = findViewById(R.id.submitTaskBtn)
         submitTaskBtn.setOnClickListener {
             playSubmitTaskAudio()
-            Toast.makeText(this, "Task Saved", Toast.LENGTH_SHORT).show()
+            submitTask()
         }
 
         val cancelBtn : Button = findViewById(R.id.cancelBtn)
         cancelBtn.setOnClickListener {
-
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
         }
+
+        //getting ratio values
+        val estimateRatio = findViewById<RadioGroup>(R.id.radio_group_estimative)
+        estimateRatio.setOnCheckedChangeListener(
+            RadioGroup.OnCheckedChangeListener { group, checkedId ->
+                val radio: RadioButton = findViewById(checkedId)
+                radioValue = radio.id
+            }
+        )
     }
 
     // render menu
@@ -75,5 +93,41 @@ class SubmitTask : AppCompatActivity() {
     private fun playSubmitTaskAudio() {
         val mediaPlayer = MediaPlayer.create(this, R.raw.submittasksound)
         mediaPlayer.start()
+    }
+
+    private fun submitTask() {
+        val taskName = findViewById<EditText>(R.id.editTextTaskName)
+        val taskPriority = findViewById<Spinner>(R.id.prioritySpinner)
+        val taskNotification = findViewById<ToggleButton>(R.id.toggleBtnNotification)
+
+        val task = Task(taskNotification.isChecked, taskPriority.selectedItem.toString(),
+            taskName.text.toString(), radioValue, UUID.randomUUID().toString())
+
+        val intent = Intent(this, MainActivity::class.java)
+        intent.putExtra("task", task)
+        startActivity(intent)
+    }
+
+    private fun fillForm(task : Task) {
+        isEditing = true
+
+        var arrayAdapter = ArrayAdapter.createFromResource(this, R.array.taskPriority,
+            android.R.layout.simple_spinner_item
+        )
+        val taskName = findViewById<EditText>(R.id.editTextTaskName)
+        val taskPriority = findViewById<Spinner>(R.id.prioritySpinner)
+        val taskNotification = findViewById<ToggleButton>(R.id.toggleBtnNotification)
+        val estimateRatio = findViewById<RadioButton>(task.taskEstimative)
+
+        taskName.setText(task.taskName)
+        taskPriority.setSelection(arrayAdapter.getPosition(task.taskPriority))
+
+        estimateRatio ?.let{
+            estimateRatio.setChecked(true)
+        }
+
+        if(task.taskNotification) {
+            taskNotification.setChecked(true)
+        } else taskNotification.setChecked(false)
     }
 }
