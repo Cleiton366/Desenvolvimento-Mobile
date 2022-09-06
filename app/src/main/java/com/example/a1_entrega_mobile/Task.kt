@@ -3,31 +3,20 @@ package com.example.a1_entrega_mobile
 import java.io.Serializable
 
 class Task : Serializable {
-    var taskId : String = ""
-    var taskName : String = ""
-    var taskEstimative : Int = 0
-    var taskPriority : String = ""
-    var taskNotification : Boolean = false
+    var id : String = ""
+    var name : String = ""
+    var estimative : Int = 0
+    var priority : Int = 0
+    var notification : Boolean = false
+    var taskList : MutableList<Task>  = ArrayList()
 
-    fun editTask(taskName : String, taskEstimative : Int,
-                 taskPriority : String, taskNotification : Boolean) {
-        this.taskName = taskName
-        this.taskEstimative = taskEstimative
-        this.taskPriority = taskPriority
-        this.taskNotification = taskNotification
+    constructor(notification : Boolean,priority: Int,
+                name: String, estimative: Int, id : String) {
+        this.name = name
+        this.estimative = estimative
+        this.priority = priority
+        this.notification= notification
+        this.id = id
     }
 
-    constructor(taskNotification: Boolean,taskPriority: String,
-                taskName: String, taskEstimative: Int, taskId : String) {
-        this.taskName = taskName
-        this.taskEstimative = taskEstimative
-        this.taskPriority = taskPriority
-        this.taskNotification = taskNotification
-        this.taskId = taskId
-    }
-
-    override fun toString () : String {
-        return "Task name:" + taskName + " Task Estimative:" + taskEstimative +
-                " Task Priority:" + taskPriority + " is notification enable? " + taskNotification
-    }
 }

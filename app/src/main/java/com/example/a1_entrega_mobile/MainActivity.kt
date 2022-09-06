@@ -13,26 +13,33 @@ import kotlin.collections.ArrayList
 import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
-
-    var tasks: MutableList<Task>  = ArrayList()
+    private var taskList : MutableList<Task> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         //setting arrays of tasks
-        val task = intent.extras?.get("task") as? Task
-        task ?.let{ tasks.add(task) }
+        val taskObj = intent.extras?.get("taskObj") as? TaskObj
+        val newTaskList = intent.extras?.get("taskList") as? MutableList<Task>
+
+        newTaskList ?.let {
+            taskList = newTaskList
+        }
+        taskObj ?.let{
+            taskList = taskObj.taskList
+        }
 
         allTasksListView()
 
         val listView : ListView = findViewById(R.id.allTasksListView)
         listView.setOnItemClickListener { parent, _, position, _ ->
-            val task = tasks[position]
+            val task = taskList[position]
 
-            Toast.makeText(this, task.toString(), Toast.LENGTH_SHORT).show()
+            val taskObj = TaskObj(taskList, task, position)
+
             val intent = Intent(this, SubmitTask::class.java)
-            intent.putExtra("task", task)
+            intent.putExtra("taskObj", taskObj)
             startActivity(intent)
         }
 
@@ -40,7 +47,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun allTasksListView () {
         val listView : ListView = findViewById(R.id.allTasksListView)
-        val tasksArr = tasks.map { it.taskName }
+        val tasksArr = taskList.map { it.name }
         val arrayAdapter : ArrayAdapter<String> = ArrayAdapter(this, android.R.layout.simple_list_item_1, tasksArr)
         listView.adapter = arrayAdapter
     }
@@ -59,7 +66,8 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.create_new_task -> {
-                val intent = Intent(this,  SubmitTask::class.java)
+                val intent = Intent(this, SubmitTask::class.java)
+                intent.putExtra("taskList", ArrayList(taskList))
                 startActivity(intent)
                 true
             }
