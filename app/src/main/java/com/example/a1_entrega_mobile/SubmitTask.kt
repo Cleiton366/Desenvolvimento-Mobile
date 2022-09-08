@@ -22,7 +22,15 @@ class SubmitTask : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_submit_task)
 
-        //getting task value if user wants to edit
+        //setting spinner values
+        val spinner: Spinner = findViewById(R.id.prioritySpinner)
+        ArrayAdapter.createFromResource(this, R.array.taskPriority,
+            android.R.layout.simple_spinner_item
+        ).also { adapter -> adapter.setDropDownViewResource(
+            android.R.layout.simple_spinner_dropdown_item)
+            spinner.adapter = adapter }
+
+        //getting task value when editing task
         val taskObj = intent.extras?.get("taskObj") as? TaskObj
         val newTaskList = intent.extras?.get("taskList") as? MutableList<Task>
 
@@ -41,14 +49,6 @@ class SubmitTask : AppCompatActivity() {
             val deleteBtn : Button = findViewById(R.id.deleteBtn)
             deleteBtn.setVisibility(View.GONE);
         }
-
-        //setting spinner values
-        val spinner: Spinner = findViewById(R.id.prioritySpinner)
-        ArrayAdapter.createFromResource(this, R.array.taskPriority,
-            android.R.layout.simple_spinner_item
-        ).also { adapter -> adapter.setDropDownViewResource(
-            android.R.layout.simple_spinner_dropdown_item)
-            spinner.adapter = adapter }
 
         //submit task btn
         val submitTaskBtn : Button = findViewById(R.id.submitTaskBtn)
