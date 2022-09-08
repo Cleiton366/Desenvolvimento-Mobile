@@ -1,52 +1,64 @@
+
 package com.example.a1_entrega_mobile
 
 import android.content.Intent
-import android.media.AudioManager
-import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.Spinner
+import android.widget.ListView
 import android.widget.Toast
-import java.io.IOException
+import kotlin.collections.ArrayList
 import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
+    private var taskList : MutableList<Task> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //setting spinner values
-        val spinner: Spinner = findViewById(R.id.prioritySpinner)
-        ArrayAdapter.createFromResource(this, R.array.taskPriority,
-            android.R.layout.simple_spinner_item
-        ).also { adapter -> adapter.setDropDownViewResource(
-            android.R.layout.simple_spinner_dropdown_item)
-            spinner.adapter = adapter }
+        //setting arrays of tasks
+        val taskObj = intent.extras?.get("taskObj") as? TaskObj
+        val newTaskList = intent.extras?.get("taskList") as? MutableList<Task>
 
-        //submit task btn
-        val submitTaskBtn : Button = findViewById(R.id.submitTaskBtn)
-        submitTaskBtn.setOnClickListener() {
-            playSubmitTaskAudio()
-            Toast.makeText(this, "Task Saved", Toast.LENGTH_SHORT).show()
+        newTaskList ?.let {
+            taskList = newTaskList
+        }
+        taskObj ?.let{
+            taskList = taskObj.taskList
         }
 
+        allTasksListView()
+
+        val listView : ListView = findViewById(R.id.allTasksListView)
+        listView.setOnItemClickListener { parent, _, position, _ ->
+            val task = taskList[position]
+
+            val taskObj = TaskObj(taskList, task, position)
+
+            val intent = Intent(this, SubmitTask::class.java)
+            intent.putExtra("taskObj", taskObj)
+            startActivity(intent)
         }
 
-    // render menu
+    }
+
+    private fun allTasksListView () {
+        val listView : ListView = findViewById(R.id.allTasksListView)
+        val tasksArr = taskList.map { it.name }
+        val arrayAdapter : ArrayAdapter<String> = ArrayAdapter(this, android.R.layout.simple_list_item_1, tasksArr)
+        listView.adapter = arrayAdapter
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu to use in the action bar
         val inflater = menuInflater
         inflater.inflate(R.menu.app_menu, menu)
-        return true;
+        return true
     }
 
-    //change activity on the menu
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.about -> {
@@ -54,25 +66,20 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.create_new_task -> {
-                true
-            }
-            R.id.view_tasks -> {
-                var intent = Intent(this,  AllTasksActivity::class.java)
+                val intent = Intent(this, SubmitTask::class.java)
+                intent.putExtra("taskList", ArrayList(taskList))
                 startActivity(intent)
                 true
             }
+            R.id.view_tasks -> {
+                true
+            }
             R.id.user_profile -> {
-                var intent = Intent(this,  UserProfile::class.java)
+                val intent = Intent(this,  UserProfile::class.java)
                 startActivity(intent)
                 true
             }
             else -> exitProcess(-1)
         }
-    }
-
-    //play audios given an url
-    fun playSubmitTaskAudio() {
-        val mediaPlayer = MediaPlayer.create(this, R.raw.submittasksound)
-        mediaPlayer.start()
     }
 }
