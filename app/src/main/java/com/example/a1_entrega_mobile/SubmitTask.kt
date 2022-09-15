@@ -8,6 +8,15 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import io.ktor.serialization.gson.*
+import kotlinx.coroutines.runBlocking
 import java.util.*
 import kotlin.system.exitProcess
 
@@ -15,8 +24,7 @@ class SubmitTask : AppCompatActivity() {
 
     private var radioValue : Int = 0
     private var isEditing : Boolean = false
-    private var taskList : MutableList<Task> = ArrayList()
-    private  var taskPosition : Int = 0
+    private var taskId : String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,18 +39,13 @@ class SubmitTask : AppCompatActivity() {
             spinner.adapter = adapter }
 
         //getting task value when editing task
-        val taskObj = intent.extras?.get("taskObj") as? TaskObj
-        val newTaskList = intent.extras?.get("taskList") as? MutableList<Task>
+        val task = intent.extras?.get("task") as? Task
 
-        newTaskList ?.let {
-            taskList = newTaskList
-        }
-        taskObj ?.let{
+        task ?.let{
             isEditing = true
-            radioValue = taskObj.task.estimative
-            taskList = taskObj.taskList
-            taskPosition = taskObj.taskPosition
-            fillForm(taskObj.task)
+            radioValue = task.estimative
+            taskId = task.id
+            fillForm(task)
         }
 
         if(!isEditing) {
@@ -61,16 +64,30 @@ class SubmitTask : AppCompatActivity() {
         val cancelBtn : Button = findViewById(R.id.cancelBtn)
         cancelBtn.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
-            intent.putExtra("taskList", ArrayList(taskList))
             startActivity(intent)
         }
 
         //delete bnt
         val deleteBtn : Button = findViewById(R.id.deleteBtn)
         deleteBtn.setOnClickListener {
-            taskList.removeAt(taskPosition)
+            val task = Task(false, 0,
+                "", radioValue, taskId)
+            runBlocking {
+                val client = HttpClient(CIO) {
+                    install(ContentNegotiation) {
+                        gson()
+                    }
+                }
+                val res : HttpResponse = client.delete("http://192.168.0.6:4000/delete-task") {
+                    contentType(ContentType.Application.Json)
+                    setBody(task)
+                }
+                if(res.status.value == 200) {
+                    println("success")
+                }
+                client.close()
+            }
             val intent = Intent(this, MainActivity::class.java)
-            intent.putExtra("taskList", ArrayList(taskList))
             startActivity(intent)
         }
 
@@ -127,24 +144,45 @@ class SubmitTask : AppCompatActivity() {
         val taskPriority = findViewById<Spinner>(R.id.prioritySpinner)
         val taskNotification = findViewById<ToggleButton>(R.id.toggleBtnNotification)
 
-
-        val task = Task(taskNotification.isChecked, taskPriority.selectedItemPosition,
-            taskName.text.toString(), radioValue, UUID.randomUUID().toString())
-
         if(isEditing) {
-            taskList[taskPosition].name = task.name
-            taskList[taskPosition].notification = task.notification
-            taskList[taskPosition].priority = task.priority
-            taskList[taskPosition].estimative = task.estimative
+            val task = Task(taskNotification.isChecked, taskPriority.selectedItemPosition,
+                taskName.text.toString(), radioValue, taskId)
+            runBlocking {
+                val client = HttpClient(CIO) {
+                    install(ContentNegotiation) {
+                        gson()
+                    }
+                }
+                val res : HttpResponse = client.put("http://192.168.0.6:4000/update-task") {
+                    contentType(ContentType.Application.Json)
+                    setBody(task)
+                }
+                if(res.status.value == 200) {
+                    println("success")
+                }
+                client.close()
+            }
         } else {
-            taskList.add(task)
+            val task = Task(taskNotification.isChecked, taskPriority.selectedItemPosition,
+                taskName.text.toString(), radioValue, UUID.randomUUID().toString())
+            runBlocking {
+                val client = HttpClient(CIO) {
+                    install(ContentNegotiation) {
+                        gson()
+                    }
+                }
+                val res : HttpResponse = client.post("http://192.168.0.6:4000/submit-task") {
+                    contentType(ContentType.Application.Json)
+                    setBody(task)
+                }
+                if(res.status.value == 201) {
+                    println("success")
+                }
+                client.close()
+            }
         }
 
-        val newTaskList = taskList
-        val taskObj = TaskObj(newTaskList, task, taskPosition)
-
         val intent = Intent(this, MainActivity::class.java)
-        intent.putExtra("taskObj", taskObj)
         startActivity(intent)
     }
 

@@ -9,8 +9,16 @@ import android.view.MenuItem
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.Toast
+import io.ktor.client.*
+import io.ktor.client.call.*
 import kotlin.collections.ArrayList
 import kotlin.system.exitProcess
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.client.engine.cio.*
+import kotlinx.coroutines.runBlocking
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.serialization.gson.*
 
 class MainActivity : AppCompatActivity() {
     private var taskList : MutableList<Task> = ArrayList()
@@ -19,30 +27,33 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //setting arrays of tasks
-        val taskObj = intent.extras?.get("taskObj") as? TaskObj
-        val newTaskList = intent.extras?.get("taskList") as? MutableList<Task>
-
-        newTaskList ?.let {
-            taskList = newTaskList
-        }
-        taskObj ?.let{
-            taskList = taskObj.taskList
-        }
-
+        fetchTaskList()
         allTasksListView()
 
         val listView : ListView = findViewById(R.id.allTasksListView)
         listView.setOnItemClickListener { parent, _, position, _ ->
             val task = taskList[position]
-
-            val taskObj = TaskObj(taskList, task, position)
-
             val intent = Intent(this, SubmitTask::class.java)
-            intent.putExtra("taskObj", taskObj)
+            intent.putExtra("task", task)
             startActivity(intent)
         }
 
+    }
+
+    private fun fetchTaskList () {
+        runBlocking {
+            var url = "http://192.168.0.6:4000/tasks-list"
+            val client = HttpClient(CIO) {
+                install(ContentNegotiation) {
+                    gson()
+                }
+            }
+            val res: HttpResponse = client.get(url)
+            if(res.status.value == 200) {
+                taskList = res.body()
+            }
+            client.close()
+        }
     }
 
     private fun allTasksListView () {
