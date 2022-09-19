@@ -45,6 +45,11 @@ class UserProfile : AppCompatActivity() {
                 startActivity(intent)
                 true
             }
+            R.id.gridView -> {
+                val intent = Intent(this,  GridView::class.java)
+                startActivity(intent)
+                true
+            }
             else -> exitProcess(-1)
         }
     }

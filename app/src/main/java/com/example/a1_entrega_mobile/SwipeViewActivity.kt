@@ -54,6 +54,8 @@ class SwipeViewActivity : AppCompatActivity() {
                 true
             }
             R.id.create_new_task -> {
+                val intent = Intent(this,  SubmitTask::class.java)
+                startActivity(intent)
                 true
             }
             R.id.view_tasks -> {
@@ -68,6 +70,11 @@ class SwipeViewActivity : AppCompatActivity() {
             }
             R.id.tabs -> {
                 val intent = Intent(this,  SwipeViewActivity::class.java)
+                startActivity(intent)
+                true
+            }
+            R.id.gridView -> {
+                val intent = Intent(this,  GridView::class.java)
                 startActivity(intent)
                 true
             }

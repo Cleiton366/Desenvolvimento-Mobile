@@ -18,6 +18,10 @@
         android:title="Tabs List"
         app:showAsAction="never"/>
 
+    <item android:id="@+id/gridView"
+    android:title="Grid View"
+    app:showAsAction="never"/>
+
     <item android:id="@+id/about"
         android:title="About"
         app:showAsAction="never"/>
