@@ -1,4 +1,3 @@
-
 package com.example.a1_entrega_mobile
 
 import android.content.Intent
@@ -6,24 +5,38 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.ArrayAdapter
-import android.widget.ListView
 import android.widget.Toast
+import androidx.viewpager2.widget.ViewPager2
+import me.relex.circleindicator.CircleIndicator3
 import kotlin.system.exitProcess
 
-class MainActivity : AppCompatActivity() {
+class SwipeViewActivity : AppCompatActivity() {
+
+    private var tittlesList = mutableListOf<String>()
+    private var aboutsList = mutableListOf<String>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        allTasksListView()
+        setContentView(R.layout.activity_swipe_view)
+
+        postToList()
+        val viewPager2 : ViewPager2 = findViewById(R.id.view_pager2)
+        viewPager2.adapter = SwipeViewPageAdapter(tittlesList, aboutsList)
+        viewPager2.orientation = ViewPager2.ORIENTATION_HORIZONTAL
+
+        val indicator : CircleIndicator3 = findViewById(R.id.swipe_view_indicator)
+        indicator.setViewPager(viewPager2)
     }
 
-    private fun allTasksListView () {
-        val listView : ListView = findViewById(R.id.allTasksListView)
-        val tasksArr = arrayListOf("Learn Kotlin","Do the laundry","Study for the test on friday",
-            "Do the grocery","Walk with the dog","Do the dishes")
-        val arrayAdapter : ArrayAdapter<String> = ArrayAdapter(this, android.R.layout.simple_list_item_1, tasksArr)
-        listView.adapter = arrayAdapter
+    private fun addToList(tittle : String, about: String) {
+        tittlesList.add(tittle)
+        aboutsList.add(about)
+    }
+
+    private fun postToList() {
+        for(i in 1..5) {
+            addToList("Tittle $i", "About $i")
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -33,6 +46,7 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    //change activity on the menu
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.about -> {
@@ -40,11 +54,11 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.create_new_task -> {
-                val intent = Intent(this,  SubmitTask::class.java)
-                startActivity(intent)
                 true
             }
             R.id.view_tasks -> {
+                val intent = Intent(this,  MainActivity::class.java)
+                startActivity(intent)
                 true
             }
             R.id.user_profile -> {

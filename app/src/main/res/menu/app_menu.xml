@@ -14,6 +14,10 @@
         android:title="My Profile"
         app:showAsAction="never"/>
 
+    <item android:id="@+id/tabs"
+        android:title="Tabs List"
+        app:showAsAction="never"/>
+
     <item android:id="@+id/about"
         android:title="About"
         app:showAsAction="never"/>

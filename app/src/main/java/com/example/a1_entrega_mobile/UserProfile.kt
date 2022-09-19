@@ -40,6 +40,11 @@ class UserProfile : AppCompatActivity() {
             R.id.user_profile -> {
                 true
             }
+            R.id.tabs -> {
+                val intent = Intent(this,  SwipeViewActivity::class.java)
+                startActivity(intent)
+                true
+            }
             else -> exitProcess(-1)
         }
     }

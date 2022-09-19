@@ -67,6 +67,11 @@ class SubmitTask : AppCompatActivity() {
                 startActivity(intent)
                 true
             }
+            R.id.tabs -> {
+                val intent = Intent(this,  SwipeViewActivity::class.java)
+                startActivity(intent)
+                true
+            }
             else -> exitProcess(-1)
         }
     }
